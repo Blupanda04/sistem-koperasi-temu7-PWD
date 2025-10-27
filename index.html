@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sistem Informasi Koperasi</title>
+  <link rel="stylesheet" href="tampilan.css">
+  <script src="jsc.js"></script>
+</head>
+<body>
+  <header>
+    <div class="container space">
+      <div>
+        <h1>Sistem Informasi Koperasi</h1>
+      </div>
+      <div class="small">User: Admin | <span id="clock"></span></div>
+    </div>
+  </header>
+
+  <div class="container grid">
+    <nav class="card">
+      <h2>Menu</h2>
+      <a href="#dashboard" class="menu-link active">Dashboard</a>
+      <a href="#anggota" class="menu-link">Manajemen Anggota</a>
+      <a href="#simpanan" class="menu-link">Simpanan</a>
+      <a href="#pinjaman" class="menu-link">Pinjaman</a>
+      <a href="#transaksi" class="menu-link">Transaksi</a>
+      <a href="#laporan" class="menu-link">Laporan / Export</a>
+      <hr />
+      <div class="small muted">Tips: Data disimpan di LocalStorage browser. Cocok untuk demo & pembelajaran.</div>
+    </nav>
+
+    <main>
+      <!-- Dashboard -->
+      <section id="dashboard" class="card view">
+        <div class="space">
+          <h1>Dashboard</h1>
+          <div>
+            <button onclick="seedSample()">Isi Data Contoh</button>
+            <button onclick="clearAll()" style="background:#ef4444">Hapus Semua</button>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:12px">
+          <div class="card small">
+            <div class="muted">Total Anggota</div>
+            <div id="stat-anggota" style="font-size:20px;font-weight:700">0</div>
+          </div>
+          <div class="card small">
+            <div class="muted">Total Simpanan</div>
+            <div id="stat-simpanan" style="font-size:20px;font-weight:700">0</div>
+          </div>
+          <div class="card small">
+            <div class="muted">Total Pinjaman</div>
+            <div id="stat-pinjaman" style="font-size:20px;font-weight:700">0</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Anggota -->
+      <section id="anggota" class="card view" style="display:none;margin-top:12px">
+        <div class="space"><h1>Manajemen Anggota</h1><div class="small muted">Tambah / Edit / Hapus anggota</div></div>
+        <div style="margin-top:12px;display:grid;grid-template-columns:1fr 320px;gap:12px">
+          <div>
+            <input id="searchAnggota" placeholder="Cari nama atau ID..." oninput="renderAnggotaTable()" />
+            <div style="margin-top:8px;overflow:auto;max-height:420px">
+              <table id="tableAnggota">
+                <thead><tr><th>ID</th><th>Nama</th><th>Telepon</th><th></th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+          <div>
+            <div class="card">
+              <h3>Form Anggota</h3>
+              <input id="anggotaId" placeholder="(otomatis)" disabled />
+              <input id="anggotaNama" placeholder="Nama lengkap" />
+              <input id="anggotaTelp" placeholder="Telepon" />
+              <textarea id="anggotaAlamat" placeholder="Alamat" rows="3"></textarea>
+              <div class="flex" style="justify-content:space-between;margin-top:8px">
+                <button onclick="saveAnggota()">Simpan</button>
+                <button onclick="resetForm()" style="background:#f97316">Reset</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Simpanan -->
+      <section id="simpanan" class="card view" style="display:none;margin-top:12px">
+        <div class="space"><h1>Transaksi Simpanan</h1><div class="small muted">Tambah penyimpanan anggota</div></div>
+        <div style="margin-top:12px;display:grid;grid-template-columns:1fr 320px;gap:12px">
+          <div>
+            <input id="searchSimpanan" placeholder="Cari berdasarkan anggota atau keterangan..." oninput="renderSimpananTable()" />
+            <div style="margin-top:8px;overflow:auto;max-height:420px">
+              <table id="tableSimpanan"><thead><tr><th>Tgl</th><th>Anggota</th><th>Jumlah</th><th>Keterangan</th><th></th></tr></thead><tbody></tbody></table>
+            </div>
+          </div>
+          <div>
+            <div class="card">
+              <h3>Form Simpanan</h3>
+              <select id="simpananAnggota"></select>
+              <input id="simpananJumlah" type="number" placeholder="Jumlah (Rp)" />
+              <input id="simpananKeterangan" placeholder="Keterangan" />
+              <div class="flex" style="justify-content:space-between;margin-top:8px">
+                <button onclick="addSimpanan()">Tambah</button>
+                <button onclick="exportCSV('simpanan')" style="background:#64748b">Export CSV</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Pinjaman -->
+      <section id="pinjaman" class="card view" style="display:none;margin-top:12px">
+        <div class="space"><h1>Pinjaman</h1><div class="small muted">Tambah & kelola pinjaman</div></div>
+        <div style="margin-top:12px;display:grid;grid-template-columns:1fr 320px;gap:12px">
+          <div>
+            <input id="searchPinjaman" placeholder="Cari berdasarkan anggota atau status..." oninput="renderPinjamanTable()" />
+            <div style="margin-top:8px;overflow:auto;max-height:420px">
+              <table id="tablePinjaman"><thead><tr><th>Tgl</th><th>Anggota</th><th>Jumlah</th><th>Status</th><th></th></tr></thead><tbody></tbody></table>
+            </div>
+          </div>
+          <div>
+            <div class="card">
+              <h3>Form Pinjaman</h3>
+              <select id="pinjamanAnggota"></select>
+              <input id="pinjamanJumlah" type="number" placeholder="Jumlah (Rp)" />
+              <select id="pinjamanStatus"><option value="Pengajuan">Pengajuan</option><option value="Disetujui">Disetujui</option><option value="Lunas">Lunas</option></select>
+              <div class="flex" style="justify-content:space-between;margin-top:8px">
+                <button onclick="addPinjaman()">Tambah</button>
+                <button onclick="exportCSV('pinjaman')" style="background:#64748b">Export CSV</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Transaksi -->
+      <section id="transaksi" class="card view" style="display:none;margin-top:12px">
+        <h1>Semua Transaksi</h1>
+        <div style="margin-top:12px">
+          <table id="tableTransaksi"><thead><tr><th>Tgl</th><th>Tipe</th><th>Anggota</th><th>Jumlah</th><th>Keterangan</th></tr></thead><tbody></tbody></table>
+        </div>
+      </section>
+
+      <!-- Laporan -->
+      <section id="laporan" class="card view" style="display:none;margin-top:12px">
+        <h1>Laporan</h1>
+        <div style="margin-top:8px" class="small muted">Unduh data sebagai CSV atau cetak halaman ini.</div>
+        <div style="margin-top:12px;display:flex;gap:8px">
+          <button onclick="exportCSV('anggota')">Export Anggota</button>
+          <button onclick="exportCSV('simpanan')">Export Simpanan</button>
+          <button onclick="exportCSV('pinjaman')">Export Pinjaman</button>
+          <button onclick="window.print()" style="background:#6b7280">Cetak</button>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</body>
+</html>
